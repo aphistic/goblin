@@ -59,7 +59,7 @@ func (b *Builder) Write(packageName string, w io.Writer) error {
 	genFile := jen.NewFile(packageName)
 	vaultName := makeVaultName(b.vaultName)
 
-	genFile.Func().Id("LoadVault" + strings.Title(b.vaultName)).
+	genFile.Func().Id("loadVault" + strings.Title(b.vaultName)).
 		Params().
 		Params(jen.Qual(goblinImport, "Vault"), jen.Id("error")).
 		Block(
