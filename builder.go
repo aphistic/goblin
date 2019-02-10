@@ -4,12 +4,14 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"fmt"
-	"go/format"
+	"github.com/dave/jennifer/jen"
 	"io"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 )
+
+const goblinImport = "github.com/aphistic/goblin"
 
 type Builder struct {
 	vaultName string
@@ -54,27 +56,27 @@ func (b *Builder) Write(packageName string, w io.Writer) error {
 		return err
 	}
 
-	fileBuf := bytes.NewBuffer(nil)
-	fmt.Fprintf(fileBuf, "package %s\n\n", packageName)
+	genFile := jen.NewFile(packageName)
+	vaultName := makeVaultName(b.vaultName)
 
-	dataName := fmt.Sprintf("goblinVaultX%s", b.vaultName)
-	fmt.Fprintf(fileBuf, "var %s = %#v\n\n", dataName, dataBuf.Bytes())
+	genFile.Func().Id("LoadVault" + strings.Title(b.vaultName)).
+		Params().
+		Params(jen.Qual(goblinImport, "Vault"), jen.Id("error")).
+		Block(
+			jen.Return(
+				jen.Qual(goblinImport, "LoadVault").Params(jen.Id(vaultName)),
+			),
+		)
 
-	outBuf, err := format.Source(fileBuf.Bytes())
+	var vaultValues []jen.Code
+	for _, b := range dataBuf.Bytes() {
+		vaultValues = append(vaultValues, jen.LitByte(b))
+	}
+	genFile.Var().Id(vaultName).Op("=").Index().Byte().Values(vaultValues...)
+
+	err = genFile.Render(w)
 	if err != nil {
 		return err
-	}
-
-	totalWritten := 0
-	for {
-		n, err := w.Write(outBuf[totalWritten:])
-		if err != nil {
-			return err
-		}
-		totalWritten = totalWritten + n
-		if totalWritten >= len(outBuf) {
-			break
-		}
 	}
 
 	return nil

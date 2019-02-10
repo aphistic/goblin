@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+func makeVaultName(name string) string {
+	return fmt.Sprintf("goblinVaultX%s", name)
+}
+
 type Vault interface{}
 
 type vault struct {

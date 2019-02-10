@@ -1,10 +1,11 @@
 package goblin
 
 import (
-	"reflect"
+	"fmt"
 )
 
-func LoadVault(vaultName string) (Vault, error) {
+func LoadVault(vault []byte) (Vault, error) {
+	return nil, fmt.Errorf("not implemented")
 }
 
 type loader struct{}
