@@ -4,42 +4,70 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"github.com/aphistic/goblin/internal/logging"
 	"github.com/dave/jennifer/jen"
 	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 )
 
 const goblinImport = "github.com/aphistic/goblin"
 
+type BuilderOption func(b *Builder)
+
+func BuilderLogger(logger logging.Logger) BuilderOption{
+	return func(b *Builder) {
+		b.logger = logger
+	}
+}
+
 type Builder struct {
+	logger logging.Logger
+
 	vaultName string
 
 	v *vault
 }
 
-func NewBuilder(vaultName string) *Builder {
-	return &Builder{
+func NewBuilder(vaultName string, opts ...BuilderOption) *Builder {
+	b := &Builder{
+		logger: logging.NewNilLogger(),
 		vaultName: vaultName,
 		v:         newVault(vaultName),
 	}
+
+	for _, opt := range opts {
+		opt(b)
+	}
+
+	return b
 }
 
 func (b *Builder) Include(globs []string) error {
 	for _, glob := range globs {
+		globDir := filepath.Dir(glob)
+		if !strings.HasSuffix(globDir, string(os.PathSeparator)) {
+			globDir = globDir + string(os.PathSeparator)
+		}
+
 		matches, err := filepath.Glob(glob)
 		if err != nil {
+			b.logger.Printf("error with path '%s': %s\n", glob, err)
 			return err
 		}
 
 		for _, match := range matches {
+			filePath := strings.TrimPrefix(match, globDir)
+
+			b.logger.Printf("match: %s\n", filePath)
 			data, err := ioutil.ReadFile(match)
 			if err != nil {
 				return err
 			}
 
-			err = b.v.SetFile(match, data)
+			err = b.v.SetFile(filePath, data)
 			if err != nil {
 				return err
 			}

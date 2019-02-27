@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/aphistic/goblin/internal/logging"
 	"os"
 
 	"github.com/alecthomas/kingpin"
@@ -40,7 +41,12 @@ func main() {
 		flagOut = fmt.Sprintf("goblin_%s.go", flagName)
 	}
 
-	b := goblin.NewBuilder(flagName)
+	logger := logging.NewPrintfLogger()
+
+	b := goblin.NewBuilder(
+		flagName,
+		goblin.BuilderLogger(logger),
+	)
 	err = b.Include(flagIncludes)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error including files: %s\n", err)

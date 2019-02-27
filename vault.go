@@ -10,7 +10,10 @@ func makeVaultName(name string) string {
 	return fmt.Sprintf("goblinVaultX%s", name)
 }
 
-type Vault interface{}
+type Vault interface {
+	Files() map[string][]byte
+	File(name string) ([]byte, bool)
+}
 
 type vault struct {
 	name string
@@ -54,4 +57,9 @@ func (v *vault) SetFile(path string, data []byte) error {
 
 func (v *vault) Files() map[string][]byte {
 	return v.root.Files()
+}
+
+func (v *vault) File(name string) ([]byte, bool) {
+	data, ok := v.root.Files()[name]
+	return data, ok
 }
