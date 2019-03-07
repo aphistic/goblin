@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"fmt"
 	"io"
 )
 
@@ -56,7 +55,6 @@ func LoadVault(vaultData []byte) (Vault, error) {
 		}
 
 		v.SetFile(header.Name, b.Bytes())
-		fmt.Printf("file: %s\n", header.Name)
 	}
 
 	return v, nil
