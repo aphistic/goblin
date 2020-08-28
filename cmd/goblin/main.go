@@ -2,19 +2,21 @@ package main
 
 import (
 	"fmt"
-	"github.com/aphistic/goblin/internal/logging"
 	"os"
 
 	"github.com/alecthomas/kingpin"
 
 	"github.com/aphistic/goblin"
+	"github.com/aphistic/goblin/internal/logging"
 )
 
 var (
-	flagName     string
-	flagPackage  string
-	flagOut      string
-	flagIncludes []string
+	flagName         string
+	flagPackage      string
+	flagOut          string
+	flagIncludes     []string
+	flagExportLoader bool
+	flagBinary       bool
 )
 
 func main() {
@@ -28,6 +30,9 @@ func main() {
 		StringVar(&flagOut)
 	cmdCreate.Flag("include", "Files to include in the vault").Short('i').
 		StringsVar(&flagIncludes)
+	cmdCreate.Flag("export-loader", "Export loader in generated code").Short('e').
+		BoolVar(&flagExportLoader)
+	cmdCreate.Flag("binary", "Write out binary data").Short('b').BoolVar(&flagBinary)
 
 	_, err := appGoblin.Parse(os.Args[1:])
 	if err != nil {
@@ -43,9 +48,9 @@ func main() {
 
 	logger := logging.NewPrintfLogger()
 
-	b := goblin.NewBuilder(
-		flagName,
-		goblin.BuilderLogger(logger),
+	b := goblin.NewMemoryBuilder(
+		goblin.MemoryBuilderLogger(logger),
+		goblin.MemoryBuilderExportLoader(flagExportLoader),
 	)
 	err = b.Include(flagIncludes)
 	if err != nil {
@@ -60,9 +65,18 @@ func main() {
 	}
 	defer f.Close()
 
-	err = b.Write(flagPackage, f)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error writing file: %s\n", err)
-		os.Exit(1)
+	if flagBinary {
+		err = b.WriteBinary(flagPackage, flagName, f)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error writing binary file: %s\n", err)
+			os.Exit(1)
+		}
+
+	} else {
+		err = b.WriteCode(flagPackage, flagName, f)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error writing code file: %s\n", err)
+			os.Exit(1)
+		}
 	}
 }
