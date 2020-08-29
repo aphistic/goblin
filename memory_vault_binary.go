@@ -8,6 +8,7 @@ import (
 	"os"
 )
 
+// MarshalBinary encodes the MemoryVault into a binary representation.
 func (v *MemoryVault) MarshalBinary() ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
 	gw := gzip.NewWriter(buf)
@@ -67,6 +68,7 @@ func (v *MemoryVault) MarshalBinary() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// UnmarshalBinary decodes the provided data into the MemoryVault.
 func (v *MemoryVault) UnmarshalBinary(data []byte) error {
 	r := bytes.NewReader(data)
 

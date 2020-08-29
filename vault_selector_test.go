@@ -13,10 +13,4 @@ func TestVaultSelectorStringers(t *testing.T) {
 		)
 		assert.Equal(t, "Vault Selector (Memory Vault)", vs.String())
 	})
-	t.Run("gostring method", func(t *testing.T) {
-		vs := NewVaultSelector(
-			SelectDefault(NewMemoryVault()),
-		)
-		assert.Equal(t, "VaultSelector{Vault: MemoryVault{}}", vs.GoString())
-	})
 }

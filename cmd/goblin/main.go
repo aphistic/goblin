@@ -1,3 +1,4 @@
+// Package main is the utility used to create and manage goblin vaults.
 package main
 
 import (
@@ -69,14 +70,14 @@ func main() {
 	defer f.Close()
 
 	if flagBinary {
-		err = b.WriteBinary(flagPackage, flagName, f)
+		err = b.WriteBinary(f)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error writing binary file: %s\n", err)
 			os.Exit(1)
 		}
 
 	} else {
-		err = b.WriteCode(flagPackage, flagName, f)
+		err = b.WriteLoader(flagPackage, flagName, f)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error writing code file: %s\n", err)
 			os.Exit(1)

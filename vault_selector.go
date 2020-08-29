@@ -6,8 +6,10 @@ import (
 	"strings"
 )
 
+// SelectOption is an option used when creating a vault selector.
 type SelectOption func(*VaultSelector)
 
+// SelectVaultMethod is the method signature a vault selector option needs to implement.
 type SelectVaultMethod func() Vault
 
 // SelectEnvBool will use the provided vault if the given environment variable is
@@ -65,6 +67,8 @@ func SelectDefault(v Vault) SelectOption {
 	}
 }
 
+// VaultSelector is a vault that will use a vault selected by one of the added
+// selectors.
 type VaultSelector struct {
 	selectedVault Vault
 	vaultOptions  []SelectVaultMethod
@@ -72,6 +76,7 @@ type VaultSelector struct {
 
 var _ Vault = &VaultSelector{}
 
+// NewVaultSelector creates a new vault selector.
 func NewVaultSelector(opts ...SelectOption) *VaultSelector {
 	vs := &VaultSelector{}
 	for _, opt := range opts {
@@ -81,6 +86,8 @@ func NewVaultSelector(opts ...SelectOption) *VaultSelector {
 	return vs
 }
 
+// GetVault returns the vault to be used by the vault selector using the
+// currently provided selectors.
 func (vs *VaultSelector) GetVault() (Vault, error) {
 	if vs.selectedVault != nil {
 		return vs.selectedVault, nil
@@ -97,15 +104,6 @@ func (vs *VaultSelector) GetVault() (Vault, error) {
 	return nil, fmt.Errorf("no vault could be selected")
 }
 
-func (vs *VaultSelector) GoString() string {
-	v, err := vs.GetVault()
-	if err != nil {
-		return `VaultSelector{Vault: Error{Could not select}}`
-	}
-
-	return `VaultSelector{Vault: ` + v.GoString() + `}`
-}
-
 func (vs *VaultSelector) String() string {
 	v, err := vs.GetVault()
 	if err != nil {
@@ -115,10 +113,14 @@ func (vs *VaultSelector) String() string {
 	return `Vault Selector (` + v.String() + `)`
 }
 
+// AppendSelector adds an additional vault selector to the end of the vault
+// selector list.
 func (vs *VaultSelector) AppendSelector(svm SelectVaultMethod) {
 	vs.vaultOptions = append(vs.vaultOptions, svm)
+	vs.selectedVault = nil
 }
 
+// Open will open the file at the provided path from the selected vault.
 func (vs *VaultSelector) Open(name string) (File, error) {
 	v, err := vs.GetVault()
 	if err != nil {
@@ -128,6 +130,7 @@ func (vs *VaultSelector) Open(name string) (File, error) {
 	return v.Open(name)
 }
 
+// Stat returns file info for the provided path from the selected vault.
 func (vs *VaultSelector) Stat(name string) (os.FileInfo, error) {
 	v, err := vs.GetVault()
 	if err != nil {
@@ -137,6 +140,8 @@ func (vs *VaultSelector) Stat(name string) (os.FileInfo, error) {
 	return v.Stat(name)
 }
 
+// ReadDir returns a slice of file info for the provided directory from the
+// selected vault.
 func (vs *VaultSelector) ReadDir(dirName string) ([]os.FileInfo, error) {
 	v, err := vs.GetVault()
 	if err != nil {
@@ -146,6 +151,8 @@ func (vs *VaultSelector) ReadDir(dirName string) ([]os.FileInfo, error) {
 	return v.ReadDir(dirName)
 }
 
+// Glob returns names of files in the selected vault that match the given
+// pattern.
 func (vs *VaultSelector) Glob(pattern string) ([]string, error) {
 	v, err := vs.GetVault()
 	if err != nil {
@@ -155,6 +162,8 @@ func (vs *VaultSelector) Glob(pattern string) ([]string, error) {
 	return v.Glob(pattern)
 }
 
+// ReadFile returns the contents of the file at the given path from the
+// selected vault.
 func (vs *VaultSelector) ReadFile(name string) ([]byte, error) {
 	v, err := vs.GetVault()
 	if err != nil {

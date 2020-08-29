@@ -11,9 +11,4 @@ func TestFSVaultStringer(t *testing.T) {
 		v := NewFilesystemVault("/")
 		assert.Equal(t, "Filesystem Vault (/)", v.String())
 	})
-
-	t.Run("gostring method", func(t *testing.T) {
-		v := NewFilesystemVault("/")
-		assert.Equal(t, `FilesystemVault{RootPath: "/"}`, v.GoString())
-	})
 }

@@ -18,20 +18,25 @@ const (
 	goblinImport = "github.com/aphistic/goblin"
 )
 
+// MemoryBuilderOption is an option used when creating a memory vault builder
 type MemoryBuilderOption func(b *MemoryBuilder)
 
+// MemoryBuilderExportLoader will cause the code for loading the vault to be
+// exported. For example, LoadVaultAssets instead of loadVaultAssets.
 func MemoryBuilderExportLoader(exportLoader bool) MemoryBuilderOption {
 	return func(b *MemoryBuilder) {
 		b.exportLoader = exportLoader
 	}
 }
 
+// MemoryBuilderLogger provides a logger for the builder to use.
 func MemoryBuilderLogger(logger logging.Logger) MemoryBuilderOption {
 	return func(b *MemoryBuilder) {
 		b.logger = logger
 	}
 }
 
+// MemoryBuilder creates binary or code representations of a memory vault.
 type MemoryBuilder struct {
 	logger       logging.Logger
 	exportLoader bool
@@ -39,6 +44,7 @@ type MemoryBuilder struct {
 	v *MemoryVault
 }
 
+// NewMemoryBuilder creates a new memory builder.
 func NewMemoryBuilder(opts ...MemoryBuilderOption) *MemoryBuilder {
 	b := &MemoryBuilder{
 		logger: logging.NewNilLogger(),
@@ -52,10 +58,12 @@ func NewMemoryBuilder(opts ...MemoryBuilderOption) *MemoryBuilder {
 	return b
 }
 
+// Include iterates over all files in the root path, then includes any file matching
+// one or more of the provided globs in the memory vault being built.
 func (b *MemoryBuilder) Include(rootPath string, globs []string) error {
 	for _, glob := range globs {
 		if strings.Contains(glob, "..") {
-			return fmt.Errorf("include paths cannot contain ..")
+			return fmt.Errorf(".. cannot be used in include paths")
 		}
 
 		fullPathGlob := filepath.Join(rootPath, glob)
@@ -102,7 +110,8 @@ func (b *MemoryBuilder) Include(rootPath string, globs []string) error {
 	return nil
 }
 
-func (b *MemoryBuilder) WriteBinary(packageName string, vaultName string, w io.Writer) error {
+// WriteBinary writes the binary representation of the memory vault to the provided io.Writer.
+func (b *MemoryBuilder) WriteBinary(w io.Writer) error {
 	vaultData, err := b.v.MarshalBinary()
 	if err != nil {
 		return err
@@ -117,7 +126,9 @@ func (b *MemoryBuilder) WriteBinary(packageName string, vaultName string, w io.W
 	return nil
 }
 
-func (b *MemoryBuilder) WriteCode(packageName string, vaultName string, w io.Writer) error {
+// WriteLoader writes code and binary data to the provided io.Writer to allow loading the memory
+// vault being built at runtime.
+func (b *MemoryBuilder) WriteLoader(packageName string, vaultName string, w io.Writer) error {
 	vaultData, err := b.v.MarshalBinary()
 	if err != nil {
 		return err

@@ -19,9 +19,10 @@ func ExampleSelectEnvBool() {
 		goblin.SelectDefault(fsVault),
 	)
 
-	fmt.Printf("%#v\n", vs)
-	// Output: VaultSelector{Vault: MemoryVault{}}
+	fmt.Printf("%s\n", vs)
+	// Output: Vault Selector (Memory Vault)
 }
+
 func ExampleSelectEnvNotEmpty() {
 	const envKey = "USE_SELECT_ENV_NON_EMPTY"
 	os.Setenv(envKey, "any value here")
@@ -34,8 +35,8 @@ func ExampleSelectEnvNotEmpty() {
 		goblin.SelectDefault(fsVault),
 	)
 
-	fmt.Printf("%#v\n", vs)
-	// Output: VaultSelector{Vault: MemoryVault{}}
+	fmt.Printf("%s\n", vs)
+	// Output: Vault Selector (Memory Vault)
 }
 
 func ExampleSelectPath() {
@@ -49,8 +50,8 @@ func ExampleSelectPath() {
 		goblin.SelectDefault(rootVault),
 	)
 
-	fmt.Printf("%#v\n", vs)
-	// Output: VaultSelector{Vault: FilesystemVault{RootPath: "/usr"}}
+	fmt.Printf("%s\n", vs)
+	// Output: Vault Selector (Filesystem Vault (/usr))
 }
 
 func ExampleSelectDefault() {
@@ -64,6 +65,6 @@ func ExampleSelectDefault() {
 		goblin.SelectDefault(memVault),
 	)
 
-	fmt.Printf("%#v\n", vs)
-	// Output: VaultSelector{Vault: FilesystemVault{RootPath: "/"}}
+	fmt.Printf("%s\n", vs)
+	// Output: Vault Selector (Filesystem Vault (/))
 }

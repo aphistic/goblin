@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 )
 
 const (
@@ -19,30 +18,7 @@ func makeMemoryVaultName(name string) string {
 	return fmt.Sprintf("goblinMemoryVaultX%s", name)
 }
 
-type FileOption func(*fileOptions)
-
-type fileOptions struct {
-	ModTime time.Time
-}
-
-func newFileOptions(opts ...FileOption) *fileOptions {
-	fo := &fileOptions{
-		ModTime: time.Now(),
-	}
-
-	for _, opt := range opts {
-		opt(fo)
-	}
-
-	return fo
-}
-
-func FileModTime(modTime time.Time) FileOption {
-	return func(fOpts *fileOptions) {
-		fOpts.ModTime = modTime
-	}
-}
-
+// MemoryVaultOption is an option used when creating a memory vault.
 type MemoryVaultOption func(*memoryVaultOptions)
 
 type memoryVaultOptions struct {
@@ -61,12 +37,16 @@ func memoryVaultRoot(root *memoryDir) MemoryVaultOption {
 	}
 }
 
+// MemoryVault is a vault stored in memory. It can be used as a temporary
+// in-memory filesystem or as a way to load a filesystem from binary data,
+// such as one embedded in a file.
 type MemoryVault struct {
 	root *memoryDir
 }
 
 var _ Vault = &MemoryVault{}
 
+// NewMemoryVault creates a new memory vault.
 func NewMemoryVault(opts ...MemoryVaultOption) *MemoryVault {
 	vaultOpts := newMemoryVaultOptions()
 	for _, opt := range opts {
@@ -74,19 +54,16 @@ func NewMemoryVault(opts ...MemoryVaultOption) *MemoryVault {
 	}
 
 	return &MemoryVault{
-		// TODO give a real modtime
 		root: vaultOpts.Root,
 	}
-}
-
-func (v *MemoryVault) GoString() string {
-	return "MemoryVault{}"
 }
 
 func (v *MemoryVault) String() string {
 	return "Memory Vault"
 }
 
+// WriteFile reads data from the provided io.Reader and then writes it to the memory vault
+// at the provided path.
 func (v *MemoryVault) WriteFile(path string, r io.Reader, opts ...FileOption) error {
 	pathParts := strings.Split(path, string(os.PathSeparator))
 	curRoot := v.root
@@ -120,6 +97,7 @@ func (v *MemoryVault) WriteFile(path string, r io.Reader, opts ...FileOption) er
 	return nil
 }
 
+// Open will open the file at the provided path from the in-memory vault.
 func (v *MemoryVault) Open(name string) (File, error) {
 	tokens, err := splitPath(name)
 	if err != nil {
@@ -138,6 +116,7 @@ func (v *MemoryVault) Open(name string) (File, error) {
 	return nil, fmt.Errorf("cannot open directory")
 }
 
+// Stat returns file info for the provided path in the in-memory vault.
 func (v *MemoryVault) Stat(name string) (os.FileInfo, error) {
 	tokens, err := splitPath(name)
 	if err != nil {
@@ -152,6 +131,7 @@ func (v *MemoryVault) Stat(name string) (os.FileInfo, error) {
 	return n.Stat()
 }
 
+// ReadDir returns a slice of file info for the provided directory in the in-memory vault.
 func (v *MemoryVault) ReadDir(dirName string) ([]os.FileInfo, error) {
 	var res []os.FileInfo
 
@@ -195,6 +175,7 @@ func (v *MemoryVault) ReadDir(dirName string) ([]os.FileInfo, error) {
 	return res, nil
 }
 
+// Glob returns names of files in the in-memory vault that match the given pattern.
 func (v *MemoryVault) Glob(pattern string) ([]string, error) {
 	// Naive implementation that just navigates the whole FS tree
 	// and runs filepath.Match on all the paths.
@@ -243,6 +224,8 @@ func (v *MemoryVault) Glob(pattern string) ([]string, error) {
 	return res, nil
 }
 
+// ReadFile returns the contents of the file at the given path from
+// the in-memory vault.
 func (v *MemoryVault) ReadFile(name string) ([]byte, error) {
 	f, err := v.Open(name)
 	if err != nil {

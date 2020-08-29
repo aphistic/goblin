@@ -26,11 +26,6 @@ func TestMemoryVaultStringers(t *testing.T) {
 		mv := NewMemoryVault()
 		assert.Equal(t, "Memory Vault", mv.String())
 	})
-
-	t.Run("gostring method", func(t *testing.T) {
-		mv := NewMemoryVault()
-		assert.Equal(t, "MemoryVault{}", mv.GoString())
-	})
 }
 
 func TestMemoryVaultReadDir(t *testing.T) {
