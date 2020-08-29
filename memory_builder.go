@@ -2,6 +2,7 @@ package goblin
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -51,16 +52,21 @@ func NewMemoryBuilder(opts ...MemoryBuilderOption) *MemoryBuilder {
 	return b
 }
 
-func (b *MemoryBuilder) Include(globs []string) error {
+func (b *MemoryBuilder) Include(rootPath string, globs []string) error {
 	for _, glob := range globs {
-		globDir := filepath.Dir(glob)
+		if strings.Contains(glob, "..") {
+			return fmt.Errorf("include paths cannot contain ..")
+		}
+
+		fullPathGlob := filepath.Join(rootPath, glob)
+		globDir := filepath.Dir(fullPathGlob)
 		if !strings.HasSuffix(globDir, string(os.PathSeparator)) {
 			globDir = globDir + string(os.PathSeparator)
 		}
 
-		matches, err := filepath.Glob(glob)
+		matches, err := filepath.Glob(fullPathGlob)
 		if err != nil {
-			b.logger.Printf("error with path '%s': %s\n", glob, err)
+			b.logger.Printf("error with path '%s': %s\n", fullPathGlob, err)
 			return err
 		}
 
@@ -69,7 +75,11 @@ func (b *MemoryBuilder) Include(globs []string) error {
 			if err != nil {
 				return err
 			}
-			filePath := strings.TrimPrefix(match, globDir)
+
+			// TODO Test how this is achieved
+			filePath := strings.TrimPrefix(match, rootPath)
+			filePath = strings.TrimPrefix(filePath, globDir)
+			filePath = strings.TrimPrefix(filePath, pathSeparator)
 
 			b.logger.Printf("Adding: %s... ", filePath)
 			data, err := ioutil.ReadFile(match)

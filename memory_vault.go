@@ -79,6 +79,14 @@ func NewMemoryVault(opts ...MemoryVaultOption) *MemoryVault {
 	}
 }
 
+func (v *MemoryVault) GoString() string {
+	return "MemoryVault{}"
+}
+
+func (v *MemoryVault) String() string {
+	return "Memory Vault"
+}
+
 func (v *MemoryVault) WriteFile(path string, r io.Reader, opts ...FileOption) error {
 	pathParts := strings.Split(path, string(os.PathSeparator))
 	curRoot := v.root

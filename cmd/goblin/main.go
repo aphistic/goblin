@@ -14,6 +14,7 @@ var (
 	flagName         string
 	flagPackage      string
 	flagOut          string
+	flagIncludeRoot  string
 	flagIncludes     []string
 	flagExportLoader bool
 	flagBinary       bool
@@ -28,6 +29,8 @@ func main() {
 		StringVar(&flagPackage)
 	cmdCreate.Flag("out", "Name to use for the output file").Short('o').
 		StringVar(&flagOut)
+	cmdCreate.Flag("include-root", "Root path to use when including files in the vault").Short('r').
+		StringVar(&flagIncludeRoot)
 	cmdCreate.Flag("include", "Files to include in the vault").Short('i').
 		StringsVar(&flagIncludes)
 	cmdCreate.Flag("export-loader", "Export loader in generated code").Short('e').
@@ -52,7 +55,7 @@ func main() {
 		goblin.MemoryBuilderLogger(logger),
 		goblin.MemoryBuilderExportLoader(flagExportLoader),
 	)
-	err = b.Include(flagIncludes)
+	err = b.Include(flagIncludeRoot, flagIncludes)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error including files: %s\n", err)
 		os.Exit(1)

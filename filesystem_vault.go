@@ -7,19 +7,27 @@ import (
 	"strings"
 )
 
-type FSVault struct {
+type FilesystemVault struct {
 	rootPath string
 }
 
-var _ Vault = &FSVault{}
+var _ Vault = &FilesystemVault{}
 
-func NewFSVault(rootPath string) *FSVault {
-	return &FSVault{
+func NewFilesystemVault(rootPath string) *FilesystemVault {
+	return &FilesystemVault{
 		rootPath: rootPath,
 	}
 }
 
-func (v *FSVault) makePath(name string) (string, error) {
+func (v *FilesystemVault) GoString() string {
+	return `FilesystemVault{RootPath: "` + v.rootPath + `"}`
+}
+
+func (v *FilesystemVault) String() string {
+	return `Filesystem Vault (` + v.rootPath + `)`
+}
+
+func (v *FilesystemVault) makePath(name string) (string, error) {
 	if name == filesystemRootPath {
 		return v.rootPath, nil
 	}
@@ -34,7 +42,7 @@ func (v *FSVault) makePath(name string) (string, error) {
 	return fullPath, nil
 }
 
-func (v *FSVault) Open(name string) (File, error) {
+func (v *FilesystemVault) Open(name string) (File, error) {
 	fullPath, err := v.makePath(name)
 	if err != nil {
 		return nil, err
@@ -48,7 +56,7 @@ func (v *FSVault) Open(name string) (File, error) {
 	return newOpenFSFile(fullPath, f), nil
 }
 
-func (v *FSVault) Stat(name string) (os.FileInfo, error) {
+func (v *FilesystemVault) Stat(name string) (os.FileInfo, error) {
 	fullPath, err := v.makePath(name)
 	if err != nil {
 		return nil, err
@@ -57,7 +65,7 @@ func (v *FSVault) Stat(name string) (os.FileInfo, error) {
 	return os.Stat(fullPath)
 }
 
-func (v *FSVault) ReadDir(dirName string) ([]os.FileInfo, error) {
+func (v *FilesystemVault) ReadDir(dirName string) ([]os.FileInfo, error) {
 	fullPath, err := v.makePath(dirName)
 	if err != nil {
 		return nil, err
@@ -66,7 +74,7 @@ func (v *FSVault) ReadDir(dirName string) ([]os.FileInfo, error) {
 	return ioutil.ReadDir(fullPath)
 }
 
-func (v *FSVault) Glob(pattern string) ([]string, error) {
+func (v *FilesystemVault) Glob(pattern string) ([]string, error) {
 	fullPattern, err := v.makePath(pattern)
 	if err != nil {
 		return nil, err
@@ -75,7 +83,7 @@ func (v *FSVault) Glob(pattern string) ([]string, error) {
 	return filepath.Glob(fullPattern)
 }
 
-func (v *FSVault) ReadFile(name string) ([]byte, error) {
+func (v *FilesystemVault) ReadFile(name string) ([]byte, error) {
 	fullPath, err := v.makePath(name)
 	if err != nil {
 		return nil, err

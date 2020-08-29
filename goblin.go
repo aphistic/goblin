@@ -1,5 +1,7 @@
 package goblin
 
+import "fmt"
+
 // Refer to https://go.googlesource.com/proposal/+/master/design/draft-iofs.md for FS implementation
 
 const (
@@ -11,4 +13,7 @@ type Vault interface {
 	ReadDirFS
 	GlobFS
 	ReadFileFS
+
+	fmt.GoStringer
+	fmt.Stringer
 }
