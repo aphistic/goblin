@@ -1,11 +1,8 @@
 language: go
 
 go:
-    - "tip"
     - "1.14"
     - "1.15"
-
-# Set CC_TEST_REPORTER_ID in Travis env vars for code coverage support
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -13,7 +10,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-  - go test -v -coverprofile=coverage.txt -covermode=atomic
+  - go test -v -coverprofile=coverage.out ./...
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

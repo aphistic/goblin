@@ -1,4 +1,7 @@
 [![GoDoc](https://godoc.org/github.com/aphistic/goblin?status.svg)](https://godoc.org/github.com/aphistic/goblin)
+[![Build Status](https://travis-ci.org/aphistic/gomol.svg?branch=master)](https://travis-ci.org/aphistic/gomol)
+[![Maintainability](https://api.codeclimate.com/v1/badges/17d20662f999c941f0c5/maintainability)](https://codeclimate.com/github/aphistic/goblin/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/17d20662f999c941f0c5/test_coverage)](https://codeclimate.com/github/aphistic/goblin/test_coverage)
 [![Go Report Card](https://goreportcard.com/badge/github.com/aphistic/goblin)](https://goreportcard.com/report/github.com/aphistic/goblin)
 
 Goblin
