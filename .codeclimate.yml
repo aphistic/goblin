@@ -8,5 +8,3 @@ plugins:
     enabled: true
   fixme:
     enabled: true
-  markdownlint:
-    enabled: true
