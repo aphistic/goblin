@@ -1,3 +1,6 @@
+[![GoDoc](https://godoc.org/github.com/aphistic/goblin?status.svg)](https://godoc.org/github.com/aphistic/goblin)
+[![Go Report Card](https://goreportcard.com/badge/github.com/aphistic/goblin)](https://goreportcard.com/report/github.com/aphistic/goblin)
+
 Goblin
 ======
 
