@@ -23,14 +23,24 @@ func (v *MemoryVault) MarshalBinary() ([]byte, error) {
 	})
 
 	for _, path := range paths {
-		fInfo, err := v.Stat(path)
+		tokens, err := splitPath(path)
+		if err != nil {
+			return nil, err
+		}
+
+		node, err := v.root.GetNode(tokens)
+		if err != nil {
+			return nil, err
+		}
+		fInfo, err := node.Stat()
 		if err != nil {
 			return nil, err
 		}
 
 		err = tw.WriteHeader(&tar.Header{
-			Name: fInfo.Name(),
-			Size: fInfo.Size(),
+			Name:    node.FullPath(),
+			ModTime: fInfo.ModTime(),
+			Size:    fInfo.Size(),
 		})
 		if err != nil {
 			return nil, err
