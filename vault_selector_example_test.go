@@ -7,6 +7,35 @@ import (
 	"github.com/aphistic/goblin"
 )
 
+func ExampleVaultSelector() {
+	// Use a FilesystemVault if a path is provided as an environment variable,
+	// but fall back to using a MemoryVault by default. This, for example,
+	// could be useful during development when you are iterating on embedded
+	// files and don't want to have to rebuild for every change.
+	const assetVaultPathKey = "ASSET_VAULT_PATH"
+
+	_ = os.Setenv(assetVaultPathKey, "/")
+
+	// Create a filesystem vault and a memory vault to use.
+	fsysAssetVault := goblin.NewFilesystemVault(os.Getenv(assetVaultPathKey))
+	memAssetVault := goblin.NewMemoryVault() // Loaded from an embedded vault
+
+	// Create a vault selector that will use the filesystem asset vault
+	// if the environment variable ASSET_VAULT_PATH has a non-empty vault,
+	// use the embedded asset vault if not.
+	assetVaultSelector := goblin.NewVaultSelector(
+		goblin.SelectEnvNotEmpty(assetVaultPathKey, fsysAssetVault),
+		goblin.SelectDefault(memAssetVault),
+	)
+
+	// Since ASSET_VAULT_PATH is not empty, we use the filesystem vault.
+	v, _ := assetVaultSelector.GetVault()
+	fmt.Printf("Vault: %s\n", v)
+
+	// Output:
+	// Vault: Filesystem Vault (/)
+}
+
 func ExampleSelectEnvBool() {
 	const envKey = "USE_SELECT_ENV_BOOL"
 	os.Setenv(envKey, "true")
