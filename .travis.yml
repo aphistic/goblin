@@ -1,20 +1,14 @@
-env:
-  global:
-    - CC_TEST_REPORTER_ID=f807056f49672bc0f4093f46f65950a8a276a8424ae821626dcfb2c66bdf91ae
-
 language: go
 
 go:
     - "1.14"
     - "1.15"
 
-before_script:
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
-  - ./cc-test-reporter before-build
+addons:
+  sonarcloud:
+    organization: aphistic
+    token:
+      secure: "iK1b0g5ZIwDZKaANCtxao+8Oa+zpNt+wulnuvIhHByAbjvdQ/WafkKDtCyusC3qApMC7CCdn7ejUA8xMuia08o7GCt09HuwuXeGRNgwPfWKKUXSa2c9hqIa8qH2Rg2hmlcY0cAAc2etD1e3OkDhrLwleJOr9/3RIGeD61rQcCjBU+EyaiffxS/LJ/aN8C+VcyoE/+IcNOJacwb/AUDfk20X8VFXZ+9nwTQQAR+DnkLDM910lC91kka+NBOxRkxq0YmAhNmtfTGPlVukkYg5lQKIBOww2h0YaXQRGmjj7eSX4ry1Uk/6aea486BBuMm3Nw4yfKxahVf+4BRlggQmU+0wLoDmzqDaIWnFrTuQiFarRrr7D0zLs/kW9v7aHP5R93xFbtES4/YGRio4Vu40yBj+LF9nieg+XyEjsIbXRW8IFCWRDgBlAfx+QWKRhGVKcMlnq0ZWhpsbpRJ+7R/W2/W1gRGqDdjqSX3Zv8o5FzPU4P3m/qpMCpBNXWteP9HPqY5je4/dJCkj6PfdbhkYfdCVJDWo1BT6blQlRI5uBWFUFYgPI/y3sSAMRHuC/NbQf9qsc8y5EgfUqZk6yfLapHTXg3YzVoGUTvDaE+ajv9oCQqoSw5zyknFRIE46u3aUWHVvfRnBZ2QY3ztIOeFdaQo6Jrv8w7AzVmDmlMVTZjT4="
 
 script:
-  - go test -v -coverprofile=c.out ./...
-
-after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - sonar-scanner
