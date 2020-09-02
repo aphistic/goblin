@@ -11,13 +11,15 @@ import (
 func newTestVault() *MemoryVault {
 	// Out of order on purpose
 	v := NewMemoryVault()
-	v.WriteFile("file.txt", bytes.NewBuffer([]byte{0x01}))
 
-	v.WriteFile("dir2/dir22/file.txt", bytes.NewBuffer([]byte{0x05}))
-	v.WriteFile("dir2/dir21/file.txt", bytes.NewBuffer([]byte{0x04}))
+	_ = v.WriteFile("file.txt", bytes.NewBuffer([]byte{0x01}))
 
-	v.WriteFile("dir1/file.txt", bytes.NewBuffer([]byte{0x02}))
-	v.WriteFile("dir1/dir11/file.txt", bytes.NewBuffer([]byte{0x03}))
+	_ = v.WriteFile("dir2/dir22/file.txt", bytes.NewBuffer([]byte{0x05}))
+	_ = v.WriteFile("dir2/dir21/file.txt", bytes.NewBuffer([]byte{0x04}))
+
+	_ = v.WriteFile("dir1/file.txt", bytes.NewBuffer([]byte{0x02}))
+	_ = v.WriteFile("dir1/dir11/file.txt", bytes.NewBuffer([]byte{0x03}))
+
 	return v
 }
 

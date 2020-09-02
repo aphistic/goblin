@@ -15,12 +15,15 @@ func (v *MemoryVault) MarshalBinary() ([]byte, error) {
 	tw := tar.NewWriter(gw)
 
 	var paths []string
-	Walk(v, ".", func(path string, info os.FileInfo, err error) error {
+	err := Walk(v, ".", func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			paths = append(paths, path)
 		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	for _, path := range paths {
 		tokens, err := splitPath(path)
@@ -65,7 +68,7 @@ func (v *MemoryVault) MarshalBinary() ([]byte, error) {
 		}
 	}
 
-	err := tw.Close()
+	err = tw.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -125,11 +128,14 @@ func (v *MemoryVault) UnmarshalBinary(data []byte) error {
 			}
 		}
 
-		v.WriteFile(
+		err = v.WriteFile(
 			header.Name,
 			b,
 			FileModTime(header.ModTime),
 		)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

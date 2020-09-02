@@ -31,12 +31,6 @@ func newMemoryVaultOptions() *memoryVaultOptions {
 	}
 }
 
-func memoryVaultRoot(root *memoryDir) MemoryVaultOption {
-	return func(vaultOpts *memoryVaultOptions) {
-		vaultOpts.Root = root
-	}
-}
-
 // MemoryVault is a vault stored in memory. It can be used as a temporary
 // in-memory filesystem or as a way to load a filesystem from binary data,
 // such as one embedded in a file.
