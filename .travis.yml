@@ -14,5 +14,6 @@ addons:
       secure: RGL5wHwkPzmLL5deETaxfFmljem1Odd+ksfqvWDFgCewuATBWZcJXI/AQUkoeetwevqa3Et3s5kYV7a+LoYqIUgD3uYmb3i/WPmhfhcHmjPw+/5Tq5TuFcobT7a388dLh48+9L9hOuuHLF83r+wI9iTWprdiG8TCq9gB1WuDR/cOft5KKhjVS7uBkv9ovOfYho1bNR4RPcoLd7cNZK8YDh+48H+yNcLRH+8YjpRSJAcA/7yfc5Pgms7ndG3TyVgnRMoXawo0KysEzIchxNQfIh0gJ4PajYIe9QQYTeHXjfP9o7vZKAaIuKiwGMFjb150CQJGhnslIRsty6yaxipKC1i8C3p3rnXVGslIMkdbAv1/KJqvoH8HOYwMsKojjKAzdBo9ow+P/FoLdPdclv1jOkEJZr5F9SaXRP5X1VkWwTxxMZ5ko25+ZXeRsubTDpuio2nGliW0GKZRjdidSi+h73dLnpp9S5VGPZ5pvAXcSqV8XIYQEJne3RlhmkMHVvswPpBshdQ+KpED2e6Dru4Ql5ltauOd7xikoeLvVIiadeVVJByqkQ2XG0kkGART7xi8tmSbDQ9mYf2uEOvJZa/l9sSXg2GrHR5OZgLeRoNxK3/HVzgCRAoyVBfmy7ClSp5UWo6bTzZtuY2Zs0Qr2P8WQHpypckECWp02Sr0ebYfcnc=
 
 script:
-  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+  - go test -coverprofile=coverage.out -covermode=count -json ./... > report.json
+  - golangci-lint run --verbose --no-config --out-format checkstyle ./... > golangci-lint.out
   - sonar-scanner -Dproject.settings=.sonar-project.properties
