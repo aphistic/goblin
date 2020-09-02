@@ -18,5 +18,5 @@ before_install:
 
 script:
   - go test -coverprofile=coverage.out -covermode=count -json ./... > report.json
-  - golangci-lint run --verbose --no-config --out-format checkstyle ./... > golangci-lint.out
+  - golangci-lint run --verbose --no-config --out-format checkstyle --issues-exit-code 0 ./... > golangci-lint.out
   - sonar-scanner -Dproject.settings=.sonar-project.properties
