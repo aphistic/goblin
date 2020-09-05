@@ -186,7 +186,7 @@ func (d *memoryDir) Stat() (os.FileInfo, error) {
 }
 
 func (d *memoryDir) Open() (File, error) {
-	return &openMemoryDir{}, nil
+	return newOpenMemoryDir(d), nil
 }
 
 type openMemoryDir struct {
@@ -202,7 +202,7 @@ func newOpenMemoryDir(dir *memoryDir) *openMemoryDir {
 }
 
 func (omd *openMemoryDir) Close() error {
-	return fmt.Errorf("dir close... what it do?")
+	return nil
 }
 
 func (omd *openMemoryDir) Read(data []byte) (int, error) {
