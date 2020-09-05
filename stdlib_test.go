@@ -24,6 +24,7 @@ func TestWalk(t *testing.T) {
 
 		assert.Equal(t,
 			[]string{
+				".",
 				"dir1",
 				"dir1/dir11",
 				"dir1/dir11/file.txt",

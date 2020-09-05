@@ -46,6 +46,10 @@ func TestSplitPath(t *testing.T) {
 }
 
 func TestValidatePath(t *testing.T) {
+	t.Run("allow '.' as the path", func(t *testing.T) {
+		err := validatePath([]string{filesystemRootPath})
+		assert.NoError(t, err)
+	})
 	t.Run("disallow . in path root", func(t *testing.T) {
 		err := validatePath([]string{".", "dir2", "dir3", "dir4"})
 		assert.EqualError(t, err, ". is not allowed in paths")

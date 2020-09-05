@@ -46,10 +46,13 @@ func (mfi *memoryFileInfo) Sys() interface{} {
 }
 
 type fsNode interface {
-	GetNode(path []string) (fsNode, error)
-	Stat() (os.FileInfo, error)
 	Name() string
 	FullPath() string
+
+	Stat() (os.FileInfo, error)
+	Open() (File, error)
+
+	GetNode(path []string) (fsNode, error)
 }
 
 type memoryDir struct {
@@ -123,7 +126,8 @@ func (d *memoryDir) CreateNode(path []string, node fsNode) error {
 }
 
 func (d *memoryDir) GetNode(path []string) (fsNode, error) {
-	if len(path) == 0 {
+	if len(path) == 0 ||
+		(len(path) == 1 && path[0] == filesystemRootPath) {
 		return d, nil
 	}
 
@@ -179,6 +183,30 @@ func (d *memoryDir) Stat() (os.FileInfo, error) {
 		size:     0,
 		node:     d,
 	}, nil
+}
+
+func (d *memoryDir) Open() (File, error) {
+	return &openMemoryDir{}, nil
+}
+
+type openMemoryDir struct {
+	memoryDir
+}
+
+var _ File = &openMemoryDir{}
+
+func newOpenMemoryDir(dir *memoryDir) *openMemoryDir {
+	return &openMemoryDir{
+		memoryDir: *dir,
+	}
+}
+
+func (omd *openMemoryDir) Close() error {
+	return fmt.Errorf("dir close... what it do?")
+}
+
+func (omd *openMemoryDir) Read(data []byte) (int, error) {
+	return 0, fmt.Errorf("dir read... what it do?")
 }
 
 type memoryFile struct {

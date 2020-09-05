@@ -24,23 +24,28 @@ func splitPath(path string) ([]string, error) {
 }
 
 func validatePath(path []string) error {
-	if len(path) == 0 {
+	switch {
+	case len(path) == 1 && path[0] == filesystemRootPath:
+		// "." is a special case
+		return nil
+	case len(path) == 0:
 		return fmt.Errorf("path cannot be empty")
-	}
-	if path[0] == pathSeparator {
+	case path[0] == pathSeparator:
 		return fmt.Errorf("path cannot be an absolute path")
 	}
+
 	for _, pathToken := range path {
 		trimPathToken := strings.TrimSpace(pathToken)
-		if trimPathToken == "." || trimPathToken == ".." {
+		switch {
+		case trimPathToken == "." || trimPathToken == "..":
 			return fmt.Errorf("%s is not allowed in paths", trimPathToken)
-		}
-		if trimPathToken == "" {
+		case trimPathToken == "":
 			return fmt.Errorf(
 				"path cannot contain empty segments: %s",
 				strings.Join(path, pathSeparator),
 			)
 		}
 	}
+
 	return nil
 }

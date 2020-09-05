@@ -98,16 +98,12 @@ func (v *MemoryVault) Open(name string) (File, error) {
 		return nil, err
 	}
 
-	f, err := v.root.GetNode(tokens)
+	node, err := v.root.GetNode(tokens)
 	if err != nil {
 		return nil, err
 	}
 
-	if memFile, ok := f.(*memoryFile); ok {
-		return memFile.Open()
-	}
-
-	return nil, fmt.Errorf("cannot open directory")
+	return node.Open()
 }
 
 // Stat returns file info for the provided path in the in-memory vault.

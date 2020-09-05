@@ -30,6 +30,16 @@ func TestMemoryVaultStringers(t *testing.T) {
 	})
 }
 
+func TestMemoryVaultOpen(t *testing.T) {
+	t.Run("open root directory", func(t *testing.T) {
+		v := newTestVault()
+
+		f, err := v.Open(filesystemRootPath)
+		require.NoError(t, err)
+		assert.NotNil(t, f)
+	})
+}
+
 func TestMemoryVaultReadDir(t *testing.T) {
 	t.Run("read root", func(t *testing.T) {
 		v := newTestVault()
