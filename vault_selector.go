@@ -159,7 +159,11 @@ func (vs *VaultSelector) Glob(pattern string) ([]string, error) {
 		return nil, err
 	}
 
-	return v.Glob(pattern)
+	if gv, ok := v.(GlobVault); ok {
+		return gv.Glob(pattern)
+	}
+
+	return nil, fmt.Errorf("not supported")
 }
 
 // ReadFile returns the contents of the file at the given path from the

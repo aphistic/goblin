@@ -22,10 +22,15 @@ const (
 type Vault interface {
 	StatFS
 	ReadDirFS
-	GlobFS
 	ReadFileFS
 
 	fmt.Stringer
+}
+
+// GlobVault is an interface that provides a Vault in addition to a GlobFS.
+type GlobVault interface {
+	Vault
+	GlobFS
 }
 
 // FileOption is a common set of options used when creating or
